@@ -1,0 +1,101 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+
+[OSEv3:vars]
+# ==============
+# Configuracoes Gerais
+# ==============
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname=uat1-openshift.domain.com.br
+openshift_master_cluster_public_hostname=uat1-openshift.domain.com.br
+ansible_ssh_user=root
+ansible_become=yes
+openshift_deployment_type=origin
+openshift_master_api_port=443
+openshift_master_console_port=443
+openshift_master_default_subdomain=uat1-apps.domain.com.br
+openshift_clock_enabled=true
+openshift_disable_check=docker_image_availability
+openshift_enable_unsupported_configurations=true
+openshift_docker_options=' --insecure-registry=172.30.0.0/16 '
+openshift_master_named_certificates=[{"certfile": "/etc/origin/master/cert.crt", "keyfile": "/etc/origin/master/cert.key", "cafile": "/etc/origin/master/ca-cert.crt"}]
+openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true']}]
+
+
+# ==============
+# Networking
+# ==============
+
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+openshift_portal_net=172.30.0.0/16
+osm_cluster_network_cidr=10.128.0.0/14
+
+# ==============
+# Autenticacao
+# ==============
+
+openshift_master_identity_providers=[{'name': 'htpasswd_auth','login': 'true', 'challenge': 'true','kind': 'HTPasswdPasswordIdentityProvider',}]
+
+# ================
+# Tunning
+# ================
+openshift_node_kubelet_args={'pods-per-core': ['10'], 'max-pods': ['250'], 'image-gc-high-threshold': ['90'], 'image-gc-low-threshold': ['80'], 'kube-reserved': ['cpu=250m,memory=150M'], 'system-reserved': ['cpu=250m,memory=150M']}
+
+# ================
+# Registry
+# ================
+openshift_hosted_registry_storage_kind=nfs
+openshift_hosted_registry_storage_access_modes=['ReadWriteMany']
+openshift_hosted_registry_storage_host=vm-02.domain.com.br
+openshift_hosted_registry_storage_nfs_directory=/nfs/exports
+openshift_hosted_registry_storage_volume_name=registry
+openshift_hosted_registry_storage_volume_size=10Gi
+
+# ================
+# Service Broker
+# ================
+openshift_hosted_etcd_storage_kind=nfs
+openshift_hosted_etcd_storage_access_modes=["ReadWriteMany"]
+openshift_hosted_etcd_storage_host=vm-02.domain.com.br
+openshift_hosted_etcd_storage_nfs_directory=/nfs/exports
+openshift_hosted_etcd_storage_volume_name=asb
+openshift_hosted_etcd_storage_volume_size=10G
+openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+
+# ===============
+# Logging Persistente
+# ===============
+openshift_logging_install_logging=true
+openshift_logging_storage_kind=nfs
+openshift_logging_storage_access_modes=['ReadWriteOnce']
+openshift_logging_storage_host=vm-02.domain.com.br
+openshift_logging_storage_nfs_directory=/nfs/exports
+openshift_logging_storage_volume_name=logging
+openshift_logging_storage_volume_size=10Gi
+
+# ===============
+# Metrics Persistente
+# ===============
+openshift_metrics_install_metrics=true
+openshift_metrics_storage_kind=nfs
+openshift_metrics_storage_access_modes=['ReadWriteOnce']
+openshift_metrics_storage_host=vm-02.domain.com.br
+openshift_metrics_storage_nfs_directory=/nfs/exports
+openshift_metrics_storage_volume_name=metrics
+openshift_metrics_storage_volume_size=10Gi
+
+[masters]
+
+vm-[01:03].domain.com.br
+
+[etcd]
+
+vm-[01:03].domain.com.br
+
+[nodes]
+
+vm-[01:03].domain.com.br openshift_node_group_name='node-config-master'
+vm-[04:05].domain.com.br openshift_node_group_name='node-config-infra'
+vm-[06:08].domain.com.br openshift_node_group_name='node-config-compute'
