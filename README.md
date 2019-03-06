@@ -1,2 +1,2 @@
 # Openshift
-Openshift Hosts
+Openshift Inventário
